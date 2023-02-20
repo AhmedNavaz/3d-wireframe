@@ -46,7 +46,7 @@ def read_file():
 
 
 # rotate the tetrahedron
-def rotate(vertices, angle, axis):
+def rotate(angle, axis):
     # rotation matrix
     if axis == "x":
         rotation_matrix = [[1, 0, 0], [0, math.cos(angle), -math.sin(angle)], [0, math.sin(angle), math.cos(angle)]]
@@ -101,8 +101,8 @@ def main():
             # rotate the object with the mouse movement
             if event.type == pygame.MOUSEMOTION:
                 x, y = event.rel
-                vertices = rotate(vertices, -x / 100, "y")
-                vertices = rotate(vertices, y / 100, "x")
+                vertices = rotate(-x / 100, "y")
+                vertices = rotate(y / 100, "x")
 
         # Clear the screen
         screen.fill((255, 255, 255))
