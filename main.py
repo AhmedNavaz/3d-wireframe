@@ -8,6 +8,7 @@ pygame.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 
+vertex_ids = []
 vertices = []
 faces = []
 edges = []
@@ -22,6 +23,7 @@ def read_file():
         # Read the vertices
         for i in range(num_vertices):
             line = file.readline()
+            vertex_ids.append(line.split(",")[0])
             vertex = [float(x) for x in line.split(",")[1:]]
             vertices.append(vertex)
 
@@ -35,11 +37,12 @@ def read_file():
             face = [int(x) for x in line.split(",")]
             faces.append(face)
 
-        # create a list of edges from the faces which are 1-6  but use 0-5
+        # create a list of edges from the faces which are 1-6 but use 0-5
         for face in faces:
             for i in range(len(face)):
                 edges.append((face[i] - 1, face[(i + 1) % len(face)] - 1))
 
+    print(vertex_ids)
     print(vertices)
     print(faces)
     print(edges)
@@ -65,15 +68,17 @@ def rotate(angle, axis):
 # draw colored faces
 def draw_faces():
     for face in faces:
-        # calculate the normal of the face as there are 6 vertices and 8 faces
+        # calculate the normal of the face
         normal = [0, 0, 0]
         for i in range(len(face)):
-            normal[0] += (vertices[face[i] - 1][1] - vertices[face[(i + 1) % len(face)] - 1][1]) * (
-                    vertices[face[i] - 1][2] + vertices[face[(i + 1) % len(face)] - 1][2])
-            normal[1] += (vertices[face[i] - 1][2] - vertices[face[(i + 1) % len(face)] - 1][2]) * (
-                    vertices[face[i] - 1][0] + vertices[face[(i + 1) % len(face)] - 1][0])
-            normal[2] += (vertices[face[i] - 1][0] - vertices[face[(i + 1) % len(face)] - 1][0]) * (
-                    vertices[face[i] - 1][1] + vertices[face[(i + 1) % len(face)] - 1][1])
+            index1 = vertex_ids.index(str(face[i]))
+            index2 = vertex_ids.index(str(face[(i + 1) % len(face)]))
+            normal[0] += (vertices[index1][1] - vertices[index2][1]) * (
+                    vertices[index1][2] + vertices[index2][2])
+            normal[1] += (vertices[index1][2] - vertices[index2][2]) * (
+                    vertices[index1][0] + vertices[index2][0])
+            normal[2] += (vertices[index1][0] - vertices[index2][0]) * (
+                    vertices[index1][1] + vertices[index2][1])
 
         # calculate the angle between the normal and the z axis
         angle = math.acos(normal[2] / math.sqrt(normal[0] ** 2 + normal[1] ** 2 + normal[2] ** 2))
@@ -82,10 +87,14 @@ def draw_faces():
         color = (0, 0, int(95 + 160 * angle / math.pi))
 
         # draw the face
-        pygame.draw.polygon(screen, color, [(int(vertices[face[i] - 1][0] + width / 2), int(vertices[
-                                                                                                face[i] - 1][
-                                                                                                1] + height / 2))
-                                            for i in range(len(face))])
+
+        pygame.draw.polygon(screen, color,
+                            [(int(vertices[vertex_ids.index(str(face[i])) - 1][0] + width / 2), int(vertices[
+                                                                                                        vertex_ids.index(
+                                                                                                            str(face[
+                                                                                                                    i])) - 1][
+                                                                                                        1] + height / 2))
+                             for i in range(len(face))])
 
 
 def main():
@@ -107,11 +116,13 @@ def main():
         # Clear the screen
         screen.fill((255, 255, 255))
 
-        # Draw the edges of the tetrahedron
+        # Draw the edges of the tetrahedron using vertices list, edges list and vertex_ids list
         for edge in edges:
+            index1 = vertex_ids.index(str(edge[0] + 1))
+            index2 = vertex_ids.index(str(edge[1] + 1))
             pygame.draw.line(screen, (0, 0, 255),
-                             (int(vertices[edge[0]][0] + width / 2), int(vertices[edge[0]][1] + height / 2)),
-                             (int(vertices[edge[1]][0] + width / 2), int(vertices[edge[1]][1] + height / 2)), 2)
+                             (int(vertices[index1][0] + width / 2), int(vertices[index1][1] + height / 2)),
+                             (int(vertices[index2][0] + width / 2), int(vertices[index2][1] + height / 2)), 2)
 
         # draw the vertices of the tetrahedron
         for vertex in vertices:
