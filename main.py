@@ -87,7 +87,6 @@ def draw_faces():
         color = (0, 0, int(95 + 160 * angle / math.pi))
 
         # draw the face
-
         pygame.draw.polygon(screen, color,
                             [(int(vertices[vertex_ids.index(str(face[i])) - 1][0] + width / 2), int(vertices[
                                                                                                         vertex_ids.index(
@@ -107,8 +106,8 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-            # rotate the object with the mouse movement
-            if event.type == pygame.MOUSEMOTION:
+            # rotate the object with the mouse click and drag
+            if event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0]:
                 x, y = event.rel
                 vertices = rotate(-x / 100, "y")
                 vertices = rotate(y / 100, "x")
